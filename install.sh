@@ -37,6 +37,33 @@ echo -e "  ${GREEN}Unified Memory for AI Coding Agents${NC}"
 echo -e "  ${BLUE}────────────────────────────────────${NC}"
 echo ""
 
+# Help function
+show_help() {
+    echo "Unified Memory Stack Installer"
+    echo ""
+    echo "Usage: curl -fsSL https://raw.githubusercontent.com/hdiesel323/mem-stack/main/install.sh | bash"
+    echo "   or: ./install.sh [options]"
+    echo ""
+    echo "Options:"
+    echo "  --help, -h        Show this help message"
+    echo "  --minimal         Install only core components (skip SpecStory, BMAD, Cartographer)"
+    echo "  --no-specstory    Skip SpecStory (conversation capture)"
+    echo "  --no-mcp-cli      Skip mcp-cli (MCP tool discovery)"
+    echo "  --no-cartographer Skip Cartographer (codebase mapping)"
+    echo "  --no-beads        Skip Beads (task tracking)"
+    echo "  --no-memvid       Skip Memvid (long-term memory)"
+    echo "  --no-claude-mem   Skip Claude-Mem (session memory)"
+    echo "  --no-bmad         Skip BMAD (orchestration)"
+    echo ""
+    echo "After install, run these commands:"
+    echo "  1. bd init                    Initialize task tracking"
+    echo "  2. /cartographer              Map codebase (in Claude Code)"
+    echo "  3. specstory run claude       Launch with conversation capture"
+    echo ""
+    echo "Documentation: https://github.com/hdiesel323/mem-stack"
+    exit 0
+}
+
 # Parse arguments
 INSTALL_SPECSTORY=true
 INSTALL_MCPCLI=true
@@ -48,6 +75,7 @@ INSTALL_BMAD=true
 
 while [[ $# -gt 0 ]]; do
     case $1 in
+        --help|-h) show_help ;;
         --no-specstory) INSTALL_SPECSTORY=false; shift ;;
         --no-mcp-cli) INSTALL_MCPCLI=false; shift ;;
         --no-cartographer) INSTALL_CARTOGRAPHER=false; shift ;;
@@ -55,12 +83,12 @@ while [[ $# -gt 0 ]]; do
         --no-memvid) INSTALL_MEMVID=false; shift ;;
         --no-claude-mem) INSTALL_CLAUDEMEM=false; shift ;;
         --no-bmad) INSTALL_BMAD=false; shift ;;
-        --minimal) 
+        --minimal)
             INSTALL_SPECSTORY=false
             INSTALL_BMAD=false
             INSTALL_CARTOGRAPHER=false
             shift ;;
-        *) echo "Unknown option: $1"; exit 1 ;;
+        *) echo "Unknown option: $1. Use --help for usage."; exit 1 ;;
     esac
 done
 
@@ -210,29 +238,30 @@ fi
 # -----------------------------------------------------------------------------
 
 echo ""
-echo -e "${GREEN}╔═══════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║                    Installation Complete!                      ║${NC}"
-echo -e "${GREEN}╠═══════════════════════════════════════════════════════════════╣${NC}"
-echo -e "${GREEN}║                                                                ║${NC}"
-echo -e "${GREEN}║  Next steps:                                                   ║${NC}"
-echo -e "${GREEN}║                                                                ║${NC}"
-echo -e "${GREEN}║  1. Initialize Beads:        bd init                           ║${NC}"
-echo -e "${GREEN}║  2. Map codebase:            /cartographer (in Claude Code)    ║${NC}"
-echo -e "${GREEN}║  3. Launch with history:     specstory run claude              ║${NC}"
-echo -e "${GREEN}║  4. Discover MCP tools:      mcp-cli                           ║${NC}"
-echo -e "${GREEN}║                                                                ║${NC}"
-echo -e "${GREEN}║  Directory structure:                                          ║${NC}"
-echo -e "${GREEN}║    .specstory/  - Conversation archive                         ║${NC}"
-echo -e "${GREEN}║    .beads/      - Task graph                                   ║${NC}"
-echo -e "${GREEN}║    .memvid/     - Long-term knowledge                          ║${NC}"
-echo -e "${GREEN}║    .claude-mem/ - Session observations                         ║${NC}"
-echo -e "${GREEN}║    .bmad/       - Orchestration config                         ║${NC}"
-echo -e "${GREEN}║    .mcp/        - MCP servers                                  ║${NC}"
-echo -e "${GREEN}║    CLAUDE.md    - Agent instructions                           ║${NC}"
-echo -e "${GREEN}║                                                                ║${NC}"
-echo -e "${GREEN}╚═══════════════════════════════════════════════════════════════╝${NC}"
+echo -e "${GREEN}══════════════════════════════════════════════════════════════════${NC}"
+echo -e "${GREEN}  ✓ Installation Complete!${NC}"
+echo -e "${GREEN}══════════════════════════════════════════════════════════════════${NC}"
 echo ""
-echo "Documentation: $REPO_URL"
+echo -e "${BLUE}  STEP 1: Initialize task tracking${NC}"
+echo "    → bd init"
+echo ""
+echo -e "${BLUE}  STEP 2: Open Claude Code and run${NC}"
+echo "    → /cartographer              (maps your codebase)"
+echo ""
+echo -e "${BLUE}  STEP 3: Start working${NC}"
+echo "    → bd ready                   (see available tasks)"
+echo "    → bd create \"Task name\"      (create a task)"
+echo "    → bd close <id> --summary    (complete a task)"
+echo ""
+echo -e "${BLUE}  OPTIONAL: Enhanced features${NC}"
+echo "    → specstory run claude       (conversation capture)"
+echo "    → mcp-cli                    (discover MCP tools)"
+echo "    → npx bmad-method@alpha install  (orchestration)"
+echo ""
+echo -e "${GREEN}──────────────────────────────────────────────────────────────────${NC}"
+echo -e "  ${BLUE}Docs:${NC} $REPO_URL"
+echo -e "  ${BLUE}Help:${NC} curl ... | bash -s -- --help"
+echo -e "${GREEN}──────────────────────────────────────────────────────────────────${NC}"
 echo ""
 
 # -----------------------------------------------------------------------------
