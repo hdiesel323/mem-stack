@@ -1,0 +1,15 @@
+# OS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+venv/
+
+# Memory Stack (runtime generated, not tracked)
+.beads/beads.db
+.claude-mem/
+
+# Optional: uncomment to exclude conversation history
+# .specstory/history/
