@@ -146,7 +146,7 @@ fi
 
 # Unified MCP
 echo -e "${BLUE}[8/8] Unified Memory MCP Server${NC}"
-if ! pip3 install mcp httpx --quiet 2>/dev/null; then
+if ! pip3 install mcp httpx --quiet >/dev/null 2>&1; then
     echo "  Note: Install mcp/httpx manually (requires Python 3.10+)"
 fi
 mkdir -p .mcp
