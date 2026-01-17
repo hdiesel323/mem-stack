@@ -222,12 +222,18 @@ echo ""
 # BMAD (runs last due to interactive prompts)
 # -----------------------------------------------------------------------------
 if [ "$INSTALL_BMAD" = true ]; then
-    echo -e "${BLUE}Installing BMAD (orchestration)...${NC}"
-    echo -e "${YELLOW}Note: BMAD may prompt for input.${NC}"
     mkdir -p .bmad/agents
-    if command -v npx &> /dev/null; then
-        npx bmad-method@alpha install || echo "  Note: Run manually: npx bmad-method@alpha install"
+    if [ -t 0 ]; then
+        # Interactive mode - run BMAD installer
+        echo -e "${BLUE}Installing BMAD (orchestration)...${NC}"
+        if command -v npx &> /dev/null; then
+            npx bmad-method@alpha install || echo "  Note: Run manually: npx bmad-method@alpha install"
+        else
+            echo "  Note: npx not found. Install Node.js, then run: npx bmad-method@alpha install"
+        fi
     else
-        echo "  Note: npx not found. Install Node.js, then run: npx bmad-method@alpha install"
+        # Non-interactive (piped) - skip BMAD prompts
+        echo -e "${YELLOW}BMAD requires interactive install. Run manually:${NC}"
+        echo "  npx bmad-method@alpha install"
     fi
 fi
