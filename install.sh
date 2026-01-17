@@ -73,7 +73,7 @@ echo ""
 
 # SpecStory
 if [ "$INSTALL_SPECSTORY" = true ]; then
-    echo -e "${BLUE}[1/8] SpecStory (conversation capture)${NC}"
+    echo -e "${BLUE}[1/7] SpecStory (conversation capture)${NC}"
     if command -v specstory &> /dev/null; then
         echo "  ✓ Already installed"
     else
@@ -89,7 +89,7 @@ fi
 
 # mcp-cli
 if [ "$INSTALL_MCPCLI" = true ]; then
-    echo -e "${BLUE}[2/8] mcp-cli (MCP infrastructure)${NC}"
+    echo -e "${BLUE}[2/7] mcp-cli (MCP infrastructure)${NC}"
     if command -v mcp-cli &> /dev/null; then
         echo "  ✓ Already installed"
     else
@@ -99,7 +99,7 @@ fi
 
 # Cartographer
 if [ "$INSTALL_CARTOGRAPHER" = true ]; then
-    echo -e "${BLUE}[3/8] Cartographer (codebase mapping)${NC}"
+    echo -e "${BLUE}[3/7] Cartographer (codebase mapping)${NC}"
     pip3 install tiktoken --quiet 2>/dev/null || pip3 install tiktoken
     if command -v claude &> /dev/null; then
         echo "  Run in Claude Code: /plugin marketplace add kingbootoshi/cartographer"
@@ -109,7 +109,7 @@ fi
 
 # Beads
 if [ "$INSTALL_BEADS" = true ]; then
-    echo -e "${BLUE}[4/8] Beads (task graph)${NC}"
+    echo -e "${BLUE}[4/7] Beads (task graph)${NC}"
     if command -v bd &> /dev/null; then
         echo "  ✓ Already installed"
     else
@@ -121,31 +121,22 @@ fi
 
 # Memvid
 if [ "$INSTALL_MEMVID" = true ]; then
-    echo -e "${BLUE}[5/8] Memvid (long-term memory)${NC}"
+    echo -e "${BLUE}[5/7] Memvid (long-term memory)${NC}"
     pip3 install memvid --quiet 2>/dev/null || pip3 install memvid
     mkdir -p .memvid
 fi
 
 # Claude-Mem
 if [ "$INSTALL_CLAUDEMEM" = true ]; then
-    echo -e "${BLUE}[6/8] Claude-Mem (session memory)${NC}"
+    echo -e "${BLUE}[6/7] Claude-Mem (session memory)${NC}"
     mkdir -p .claude-mem
     if command -v claude &> /dev/null; then
         echo "  Run: claude mcp add claude-mem -- npx -y @anthropic/claude-mem"
     fi
 fi
 
-# BMAD
-if [ "$INSTALL_BMAD" = true ]; then
-    echo -e "${BLUE}[7/8] BMAD (orchestration)${NC}"
-    mkdir -p .bmad/agents
-    if command -v npx &> /dev/null; then
-        npx bmad-method@alpha install 2>/dev/null || echo "  Note: Run manually: npx bmad-method@alpha install"
-    fi
-fi
-
 # Unified MCP
-echo -e "${BLUE}[8/8] Unified Memory MCP Server${NC}"
+echo -e "${BLUE}[7/7] Unified Memory MCP Server${NC}"
 if ! pip3 install mcp httpx --quiet >/dev/null 2>&1; then
     echo "  Note: Install mcp/httpx manually (requires Python 3.10+)"
 fi
@@ -226,3 +217,17 @@ echo -e "${GREEN}╚════════════════════
 echo ""
 echo "Documentation: $REPO_URL"
 echo ""
+
+# -----------------------------------------------------------------------------
+# BMAD (runs last due to interactive prompts)
+# -----------------------------------------------------------------------------
+if [ "$INSTALL_BMAD" = true ]; then
+    echo -e "${BLUE}Installing BMAD (orchestration)...${NC}"
+    echo -e "${YELLOW}Note: BMAD may prompt for input.${NC}"
+    mkdir -p .bmad/agents
+    if command -v npx &> /dev/null; then
+        npx bmad-method@alpha install || echo "  Note: Run manually: npx bmad-method@alpha install"
+    else
+        echo "  Note: npx not found. Install Node.js, then run: npx bmad-method@alpha install"
+    fi
+fi
