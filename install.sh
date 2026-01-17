@@ -22,10 +22,20 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}"
-echo "╔═══════════════════════════════════════════════════════════════╗"
-echo "║         Unified Memory Stack - Quick Install                   ║"
-echo "╚═══════════════════════════════════════════════════════════════╝"
+cat << 'BANNER'
+
+  ███╗   ███╗███████╗███╗   ███╗    ███████╗████████╗ █████╗  ██████╗██╗  ██╗
+  ████╗ ████║██╔════╝████╗ ████║    ██╔════╝╚══██╔══╝██╔══██╗██╔════╝██║ ██╔╝
+  ██╔████╔██║█████╗  ██╔████╔██║    ███████╗   ██║   ███████║██║     █████╔╝
+  ██║╚██╔╝██║██╔══╝  ██║╚██╔╝██║    ╚════██║   ██║   ██╔══██║██║     ██╔═██╗
+  ██║ ╚═╝ ██║███████╗██║ ╚═╝ ██║    ███████║   ██║   ██║  ██║╚██████╗██║  ██╗
+  ╚═╝     ╚═╝╚══════╝╚═╝     ╚═╝    ╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝
+
+BANNER
 echo -e "${NC}"
+echo -e "  ${GREEN}Unified Memory for AI Coding Agents${NC}"
+echo -e "  ${BLUE}────────────────────────────────────${NC}"
+echo ""
 
 # Parse arguments
 INSTALL_SPECSTORY=true
@@ -56,19 +66,20 @@ done
 
 # Check we're in a git repo or project directory
 if [ ! -d ".git" ] && [ ! -f "package.json" ] && [ ! -f "pyproject.toml" ] && [ ! -f "Cargo.toml" ]; then
-    echo -e "${YELLOW}Warning: Not in a recognized project directory.${NC}"
     if [ -t 0 ]; then
         # Interactive mode - ask for confirmation
-        read -p "Continue anyway? (y/N) " -n 1 -r
+        echo -e "${YELLOW}This doesn't look like a project directory.${NC}"
+        read -p "Install here anyway? (y/N) " -n 1 -r
         echo
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
             exit 1
         fi
-    else
-        # Non-interactive - continue with warning
-        echo -e "${YELLOW}Continuing anyway (non-interactive mode)...${NC}"
     fi
+    # Non-interactive - just continue silently
 fi
+
+echo -e "  ${BLUE}Installing to:${NC} $(pwd)"
+echo ""
 
 # -----------------------------------------------------------------------------
 # Install components
