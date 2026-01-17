@@ -1,397 +1,238 @@
 # Unified Memory Stack
 
-A cohesive memory layer for AI coding agents that integrates eight complementary systems:
+A cohesive memory layer for AI coding agents that integrates eight complementary systems into one install.
 
-| System | Purpose | Timescale/Function |
-|--------|---------|-------------------|
-| **[SpecStory](https://github.com/specstoryai/getspecstory)** | Conversation history capture | Raw archive (searchable) |
-| **[mcp-cli](https://github.com/philschmid/mcp-cli)** | Token-efficient MCP access | MCP infrastructure |
-| **[Cartographer](https://github.com/kingbootoshi/cartographer)** | Codebase architecture map | Project structure |
-| **[Beads](https://github.com/steveyegge/beads)** | Task dependency graph | Current work |
-| **[Memvid](https://github.com/memvid/memvid)** | Long-term knowledge | Days → months |
-| **[Claude-Mem](https://github.com/thedotmack/claude-mem)** | Session observations | Minutes → hours |
-| **[BMAD](https://github.com/bmad-code-org/BMAD-METHOD)** | Orchestration | Task complexity |
+## Quick Install
+
+```bash
+# In your project directory
+curl -fsSL https://raw.githubusercontent.com/hdiesel323/mem-stack/main/install.sh | bash
+```
+
+That's it. The installer sets up everything automatically.
+
+## What Gets Installed
+
+| System | Purpose | Data Location |
+|--------|---------|---------------|
+| **[Beads](https://github.com/steveyegge/beads)** | Task dependency graph | `.beads/` |
+| **[Memvid](https://github.com/memvid/memvid)** | Long-term knowledge | `.memvid/` |
+| **[Claude-Mem](https://github.com/thedotmack/claude-mem)** | Session observations | `.claude-mem/` |
+| **[SpecStory](https://github.com/specstoryai/getspecstory)** | Conversation archive | `.specstory/` |
+| **[Cartographer](https://github.com/kingbootoshi/cartographer)** | Codebase mapping | `docs/CODEBASE_MAP.md` |
+| **[mcp-cli](https://github.com/philschmid/mcp-cli)** | MCP tool discovery | CLI tool |
+| **[BMAD](https://github.com/bmad-code-org/BMAD-METHOD)** | Task orchestration | `.bmad/` |
+| **Unified MCP** | Integration layer | `.mcp/` |
+
+## Setup Guide
+
+### 1. Install in Your Project
+
+```bash
+cd /path/to/your/project
+curl -fsSL https://raw.githubusercontent.com/hdiesel323/mem-stack/main/install.sh | bash
+```
+
+### 2. Initialize Beads (Task Tracking)
+
+```bash
+bd init
+```
+
+### 3. Map Your Codebase (in Claude Code)
+
+```
+/cartographer
+```
+
+This creates `docs/CODEBASE_MAP.md` with your project's architecture.
+
+### 4. Optional: Install BMAD (if skipped during install)
+
+```bash
+npx bmad-method@alpha install
+```
+
+### 5. Start Working
+
+```bash
+# Launch Claude with conversation capture
+specstory run claude
+
+# Or just use Claude Code directly - memory stack is ready
+```
+
+## Directory Structure After Install
+
+```
+your-project/
+├── .beads/              # Task graph (git-tracked)
+├── .memvid/             # Long-term knowledge
+├── .claude-mem/         # Session observations (gitignored)
+├── .specstory/history/  # Conversation archive
+├── .bmad/agents/        # BMAD orchestration
+├── .mcp/
+│   ├── unified_memory_mcp.py
+│   └── session_hooks.py
+├── .mcp.json            # MCP server config
+├── .gitignore           # Updated with memory stack entries
+├── CLAUDE.md            # Agent instructions
+└── docs/
+    └── CODEBASE_MAP.md  # After running /cartographer
+```
+
+## Daily Workflow
+
+### Starting a Session
+
+```bash
+# Check what's ready to work on
+bd ready
+
+# See task details
+bd show <task-id>
+
+# Claim a task
+bd update <task-id> --status in-progress
+```
+
+### During Work
+
+```bash
+# Found new work while on a task?
+bd create "New task title" --discovered-from <current-task-id>
+
+# Need to block current task?
+bd update <task-id> --status blocked --blocked-by <blocker-id>
+```
+
+### Completing Work
+
+```bash
+# Close with summary (persists to long-term memory)
+bd close <task-id> --summary "Implemented X by doing Y"
+
+# Sync to git
+bd sync
+```
+
+### Querying Memory
+
+The unified MCP server routes questions automatically:
+
+| Question Type | Routes To | Example |
+|--------------|-----------|---------|
+| Code location | Cartographer | "Where is authentication?" |
+| Current tasks | Beads | "What's ready to work on?" |
+| Recent activity | Claude-Mem | "What did I just do?" |
+| Past decisions | Memvid | "Why did we choose Postgres?" |
+
+## Install Options
+
+```bash
+# Minimal install (skip optional components)
+curl ... | bash -s -- --minimal
+
+# Skip specific components
+curl ... | bash -s -- --no-specstory --no-bmad
+
+# Available flags:
+#   --no-specstory    Skip conversation capture
+#   --no-mcp-cli      Skip MCP CLI tool
+#   --no-cartographer Skip codebase mapping
+#   --no-beads        Skip task tracking
+#   --no-memvid       Skip long-term memory
+#   --no-claude-mem   Skip session memory
+#   --no-bmad         Skip orchestration
+#   --minimal         Only core components
+```
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                     THE COMPLETE STACK                               │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                      │
-│  CAPTURE LAYER                                                       │
-│  └── SpecStory         Raw AI conversations → .specstory/history/   │
-│                                                                      │
-│  INFRASTRUCTURE                                                      │
-│  └── mcp-cli           Token-efficient MCP server discovery/calls   │
-│                                                                      │
-│  MEMORY LAYERS (by timescale)                                       │
-│  ├── Claude-Mem        Minutes-hours (session observations)         │
-│  ├── Beads             Hours-days (task dependencies)               │
-│  └── Memvid            Days-months (long-term decisions)            │
-│                                                                      │
-│  UNDERSTANDING                                                       │
-│  └── Cartographer      Codebase architecture map                    │
-│                                                                      │
-│  ORCHESTRATION                                                       │
-│  └── BMAD              Scale-adaptive agent coordination            │
-│                                                                      │
-└─────────────────────────────────────────────────────────────────────┘
-```
-
-## Why Eight Systems?
-
-Each solves a different problem:
-
-```
 ┌─────────────────────────────────────────────────────────────────┐
-│                     PROJECT INIT                                 │
+│                    MEMORY TIMESCALES                             │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│  /cartographer                                                   │
-│           ↓                                                      │
-│  docs/CODEBASE_MAP.md created                                   │
-│           ↓                                                      │
-│  Indexed to Memvid for semantic search                          │
+│  Minutes-Hours     Claude-Mem      Session observations          │
+│        ↓                                                         │
+│  Hours-Days        Beads           Task dependencies             │
+│        ↓                                                         │
+│  Days-Months       Memvid          Long-term decisions           │
+│        ↓                                                         │
+│  Permanent         SpecStory       Raw conversation archive      │
 │                                                                  │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓
-┌─────────────────────────────────────────────────────────────────┐
-│                     SESSION START                                │
 ├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  "Where is authentication handled?"                              │
-│           ↓                                                      │
-│  Cartographer: query_codebase("auth") → src/auth/, middleware/  │
-│                                                                  │
-│  "What should I work on?"                                        │
-│           ↓                                                      │
-│  Beads: bd ready → [task-1, task-2, task-3]                     │
-│                                                                  │
-│  "What was I doing yesterday?"                                   │
-│           ↓                                                      │
-│  Claude-Mem: timeline(24h) → [observations...]                  │
-│                                                                  │
-│  "Why did we choose Postgres?"                                   │
-│           ↓                                                      │
-│  Memvid: search("postgres decision") → [decision record]        │
-│                                                                  │
-│  "This looks complex..."                                         │
-│           ↓                                                      │
-│  BMAD: assess → Level 3, use multi-agent orchestration          │
-│                                                                  │
+│                    UNDERSTANDING                                 │
+│  Cartographer      Codebase architecture map                     │
+│  BMAD              Complexity assessment & orchestration         │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-## Quick Start
-
-```bash
-# Clone and bootstrap
-git clone https://github.com/hdiesel323/mem-stack
-cd mem-stack
-chmod +x bootstrap.sh
-./bootstrap.sh
-
-# Copy CLAUDE.md to your project
-cp CLAUDE.md /path/to/your/project/
-
-# Initialize in your project
-cd /path/to/your/project
-bd init                    # Initialize Beads
-specstory run claude       # Launch with conversation capture
-
-# Or use mcp-cli to discover MCP tools
-mcp-cli                    # List all available MCP servers/tools
-mcp-cli grep "*memory*"    # Search for memory-related tools
-```
-
-## Data Flow
-
-### The Memory Pipeline
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  specstory run claude                                            │
-│         │                                                        │
-│         ▼                                                        │
-│  SpecStory captures raw conversation → .specstory/history/       │
-│         │                                                        │
-│         ├─→ Claude-Mem extracts key observations (session)       │
-│         │                                                        │
-│         ├─→ Memvid stores long-term decisions/learnings          │
-│         │                                                        │
-│         └─→ Beads tracks work items discovered                   │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-### Project Initialization
-
-```
-/cartographer
-    │
-    ├─→ Parallel Sonnet subagents analyze codebase
-    ├─→ Creates docs/CODEBASE_MAP.md
-    └─→ Index to Memvid for semantic search
-```
-
-### Session Lifecycle
-
-```
-SESSION START
-    │
-    ├─→ Cartographer: load codebase map
-    ├─→ Claude-Mem: load recent summaries
-    ├─→ Memvid: query relevant knowledge  
-    ├─→ Beads: get ready tasks
-    └─→ BMAD: assess complexity level
-           │
-           ▼
-      DURING WORK
-           │
-    ├─→ "Where is X?" → Query codebase map
-    ├─→ Claim task (Beads: atomic)
-    ├─→ Work... Claude-Mem captures observations
-    ├─→ Need history? → Query Memvid
-    ├─→ Discover new work? → bd create --discovered-from
-    └─→ Complete? → bd close
-           │
-           ▼
-     SESSION END
-           │
-    ├─→ Generate summary
-    ├─→ Extract learnings → append to Memvid
-    ├─→ Beads auto-syncs to git
-    └─→ SpecStory has full conversation
-```
-
-### After Major Changes
-
-```
-memory:refresh_codebase_map
-    │
-    ├─→ Cartographer update mode (only changed files)
-    └─→ Re-index to Memvid
-```
-
-### Query Routing
-
-The unified MCP server automatically routes queries:
-
-| Query Pattern | Routes To | Example |
-|--------------|-----------|---------|
-| Architecture | Cartographer | "Where is auth?", "Project structure" |
-| Work state | Beads | "What's ready?", "What's blocked?" |
-| Recent activity | Claude-Mem | "What did I just do?", "Earlier today" |
-| Historical | Memvid | "Why did we choose X?", "History of Y" |
-| Complexity | BMAD | "Is this complex?", "How to approach?" |
-
-## File Locations
-
-```
-your-project/
-├── .specstory/
-│   └── history/         # Raw conversation archive (searchable)
-├── docs/
-│   └── CODEBASE_MAP.md  # Cartographer output (git-tracked)
-├── .beads/
-│   ├── beads.jsonl      # Task graph (git-tracked)
-│   └── beads.db         # SQLite cache (gitignored)
-├── .memvid/
-│   └── knowledge.mv2    # Long-term memory (git-tracked)
-├── .claude-mem/
-│   └── sessions.db      # Session observations (gitignored)
-├── .bmad/
-│   ├── config.yaml      # BMAD configuration
-│   └── agents/          # Custom agent definitions
-├── .mcp/
-│   └── unified_memory_mcp.py
-├── mcp_servers.json     # mcp-cli configuration
-├── .mcp.json            # MCP server configuration
-└── CLAUDE.md            # Instructions for Claude
-```
-
-## MCP Tools
-
-The unified MCP server exposes these tools:
+## MCP Tools Reference
 
 ### Session Management
-
 ```
-memory:start_session     - Initialize with all contexts
-memory:end_session       - Persist learnings, sync all systems
-```
-
-### Codebase Understanding (Cartographer)
-
-```
-memory:get_codebase_map       - Get full architecture map
-memory:query_codebase         - Search for specific files/modules
-memory:refresh_codebase_map   - Update map after code changes
-memory:index_codebase_to_memory - Index map to Memvid
+memory:start_session     Initialize with all contexts
+memory:end_session       Persist learnings, sync systems
 ```
 
 ### Queries
-
 ```
-memory:query             - Smart routing based on question
-memory:search_knowledge  - Direct Memvid search
-memory:get_recent        - Direct Claude-Mem query
-```
-
-### Task Management
-
-```
-memory:task_ready        - Get ready tasks from Beads
-memory:task_create       - Create with provenance linking
-memory:task_close        - Close and update dependencies
+memory:query             Smart routing based on question
+memory:search_knowledge  Direct Memvid search
+memory:task_ready        Get ready tasks from Beads
 ```
 
-### Knowledge Capture
-
+### Recording
 ```
-memory:log_decision      - Record decision for long-term memory
+memory:log_decision      Record decision for long-term memory
+memory:task_create       Create task with provenance linking
+memory:task_close        Close and update dependencies
 ```
-
-## Integration Points
-
-### Beads → Memvid
-
-When completing significant tasks, learnings are extracted and persisted:
-
-```python
-# On task complete with detailed summary
-await on_task_complete(memory, "bd-a1b2", "Implemented OAuth2...")
-# → Automatically appends to Memvid if summary is substantial
-```
-
-### Claude-Mem → Session Context
-
-Claude-Mem's lifecycle hooks bridge to the unified system:
-
-```python
-CLAUDE_MEM_HOOK_MAPPING = {
-    "SessionStart": on_session_start,  # Load all contexts
-    "Stop": on_session_end,            # Persist learnings
-    "SessionEnd": on_session_end,      # Final cleanup
-}
-```
-
-### BMAD → Task Selection
-
-BMAD complexity assessment influences task approach:
-
-```python
-level = memory._assess_complexity(ready_tasks)
-# L0: Direct execution
-# L1: Single agent
-# L2: Specialized agent
-# L3: Multi-agent
-# L4: Full orchestration
-```
-
-## Examples
-
-### Starting a Session
-
-```python
-# Via MCP tool
-result = await memory.start_session(task_hint="auth system")
-
-# Returns:
-{
-    "ready_tasks": [...],
-    "recent_context": [...],
-    "relevant_knowledge": [...],  # From Memvid based on hint
-    "recommended_level": 2        # BMAD complexity
-}
-```
-
-### Recording a Decision
-
-```python
-await memory.log_decision(
-    topic="database-choice",
-    decision="PostgreSQL",
-    rationale="Need ACID transactions for financial data",
-    alternatives_considered=["MongoDB", "SQLite"]
-)
-# → Persisted to Memvid, retrievable later
-```
-
-### Discovering Work
-
-```python
-# While on task bd-a1b2, discover need for validation
-await memory.task_create(
-    title="Add input validation",
-    task_type="task",
-    priority=2,
-    discovered_from="bd-a1b2"  # Provenance link
-)
-# → Creates bd-xxxx with discovered-from dependency
-```
-
-## Best Practices
-
-### Do
-
-- ✅ Start sessions with `memory:start_session`
-- ✅ Log significant decisions with `memory:log_decision`
-- ✅ Use `--discovered-from` when creating related tasks
-- ✅ End sessions properly to persist learnings
-- ✅ Query Memvid before re-making past decisions
-
-### Don't
-
-- ❌ Create markdown TODO files (use Beads)
-- ❌ Rely on conversation history alone (use Claude-Mem)
-- ❌ Re-discover past decisions (query Memvid first)
-- ❌ Tackle L3+ tasks without BMAD assessment
-- ❌ Close tasks without checking downstream dependencies
 
 ## Troubleshooting
 
-### Beads not syncing
-
+### Install fails with 404
+GitHub CDN caching. Wait 2-3 minutes or add cache-busting:
 ```bash
-# Force sync
-bd sync
+curl -fsSL "https://raw.githubusercontent.com/hdiesel323/mem-stack/main/install.sh?$(date +%s)" | bash
+```
 
-# Check daemon status
+### MCP server won't start
+Requires Python 3.10+. Check version:
+```bash
+python3 --version
+pip3 install mcp httpx
+```
+
+### Beads not syncing
+```bash
+bd sync
 bd daemon status
 ```
 
-### Memvid not finding results
-
+### BMAD install hangs
+BMAD has interactive prompts. Run directly in terminal:
 ```bash
-# Check store exists
-ls -la .memvid/knowledge.mv2
-
-# Rebuild index
-memvid reindex .memvid/knowledge.mv2
+npx bmad-method@alpha install
 ```
 
-### Claude-Mem not responding
+## Requirements
 
-```bash
-# Check service
-curl http://localhost:37777/health
-
-# Restart via Claude Code
-claude mcp restart claude-mem
-```
+- **Git** - for Beads sync
+- **Python 3.10+** - for MCP server
+- **Node.js** - for BMAD (optional)
+- **Homebrew** (macOS) or **curl** - for component installs
 
 ## Contributing
 
-PRs welcome! Areas of interest:
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-- [ ] BMAD deep integration (invoke specific agents)
-- [ ] SpecStory → Memvid pipeline (extract learnings from conversations)
-- [ ] mcp-cli integration for dynamic tool discovery
-- [ ] Web UI for knowledge exploration
-- [ ] Cross-project memory federation
-- [ ] RAG over SpecStory archive
+Areas of interest:
+- SpecStory → Memvid pipeline (extract learnings)
+- Web UI for knowledge exploration
+- Cross-project memory federation
 
 ## License
 
