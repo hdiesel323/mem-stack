@@ -57,10 +57,16 @@ done
 # Check we're in a git repo or project directory
 if [ ! -d ".git" ] && [ ! -f "package.json" ] && [ ! -f "pyproject.toml" ] && [ ! -f "Cargo.toml" ]; then
     echo -e "${YELLOW}Warning: Not in a recognized project directory.${NC}"
-    read -p "Continue anyway? (y/N) " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        exit 1
+    if [ -t 0 ]; then
+        # Interactive mode - ask for confirmation
+        read -p "Continue anyway? (y/N) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            exit 1
+        fi
+    else
+        # Non-interactive - continue with warning
+        echo -e "${YELLOW}Continuing anyway (non-interactive mode)...${NC}"
     fi
 fi
 
