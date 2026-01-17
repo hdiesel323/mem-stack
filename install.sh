@@ -154,9 +154,11 @@ mkdir -p docs
 echo ""
 echo -e "${GREEN}Downloading configuration files...${NC}"
 
-curl -fsSL "$REPO_RAW/src/unified_memory_mcp.py" -o .mcp/unified_memory_mcp.py 2>/dev/null || echo "  Note: Download manually from $REPO_URL"
-curl -fsSL "$REPO_RAW/src/session_hooks.py" -o .mcp/session_hooks.py 2>/dev/null || true
-curl -fsSL "$REPO_RAW/CLAUDE.md" -o CLAUDE.md 2>/dev/null || echo "  Note: Download CLAUDE.md manually from $REPO_URL"
+# Add cache-busting parameter to avoid GitHub CDN caching issues
+CACHE_BUST="?$(date +%s)"
+curl -fsSL "$REPO_RAW/src/unified_memory_mcp.py$CACHE_BUST" -o .mcp/unified_memory_mcp.py 2>/dev/null || echo "  Note: Download manually from $REPO_URL"
+curl -fsSL "$REPO_RAW/src/session_hooks.py$CACHE_BUST" -o .mcp/session_hooks.py 2>/dev/null || true
+curl -fsSL "$REPO_RAW/CLAUDE.md$CACHE_BUST" -o CLAUDE.md 2>/dev/null || echo "  Note: Download CLAUDE.md manually from $REPO_URL"
 
 # Create .mcp.json if not exists
 if [ ! -f ".mcp.json" ]; then
